@@ -1,23 +1,24 @@
 import { TRPCError } from '@trpc/server';
+
+import { prisma } from '~/server/db/client';
 import {
   deleteUserReviewHandler,
+  getReviewHandler,
   getReviewReactionsHandler,
   getReviewsInfiniteHandler,
   reportReviewHandler,
   toggleReactionHandler,
   upsertReviewHandler,
-} from './../controllers/review.controller';
+} from '~/server/controllers/review.controller';
+import { getByIdSchema, reportInputSchema } from '~/server/schema/base.schema';
 import {
   getAllReviewSchema,
   getReviewReactionsSchema,
+  reviewUpsertSchema,
   toggleReactionInput,
-} from './../schema/review.schema';
-
+} from '~/server/schema/review.schema';
 import { middleware, protectedProcedure, publicProcedure, router } from '~/server/trpc';
 import { throwAuthorizationError } from '~/server/utils/errorHandling';
-import { reviewUpsertSchema } from '~/server/schema/review.schema';
-import { prisma } from '~/server/db/client';
-import { getByIdSchema, reportInputSchema } from '~/server/schema/base.schema';
 
 const isOwnerOrModerator = middleware(async ({ ctx, next, input }) => {
   if (!ctx?.user) throw new TRPCError({ code: 'UNAUTHORIZED' });
@@ -46,6 +47,7 @@ const isOwnerOrModerator = middleware(async ({ ctx, next, input }) => {
 export const reviewRouter = router({
   getAll: publicProcedure.input(getAllReviewSchema).query(getReviewsInfiniteHandler),
   getReactions: publicProcedure.input(getReviewReactionsSchema).query(getReviewReactionsHandler),
+  getById: publicProcedure.input(getByIdSchema).query(getReviewHandler),
   upsert: protectedProcedure
     .input(reviewUpsertSchema)
     .use(isOwnerOrModerator)
