@@ -27,6 +27,7 @@ import { showSuccessNotification, showErrorNotification } from '~/utils/notifica
 import { trpc } from '~/utils/trpc';
 import produce from 'immer';
 import { useRouter } from 'next/router';
+import { openModal } from '@mantine/modals';
 
 const reports = [
   {

@@ -34,7 +34,7 @@ import { PageLoader } from '~/components/PageLoader/PageLoader';
 import { useHotkeys } from '@mantine/hooks';
 import { ReportImageButton } from '~/components/Gallery/ReportImageButton';
 import { Reactions } from '~/components/Reaction/Reactions';
-import { useClientHistoryIndex } from '~/store/ClientHistoryStore';
+import { useHasClientHistory } from '~/store/ClientHistoryStore';
 
 export default function GalleryImageDetail() {
   const router = useRouter();
@@ -45,7 +45,7 @@ export default function GalleryImageDetail() {
   // const { back: goBack } = useNavigateBack();
   const returnUrl = router.query.returnUrl as string;
   const active = router.query.active === 'true';
-  const historyIndex = useClientHistoryIndex();
+  const hasHistory = useHasClientHistory();
 
   const { modelId, modelVersionId, reviewId, userId, infinite } = filters;
 
@@ -78,14 +78,14 @@ export default function GalleryImageDetail() {
 
   // #region [back button functionality]
   const handleBackClick = () => {
-    if (historyIndex > 0) router.back();
+    if (hasHistory) router.back();
     else router.push(returnUrl ?? '/gallery', undefined, { shallow: true });
   };
 
   const handleCloseContext = () => {
     const { active, ...query } = router.query;
     if (active === 'true') {
-      if (historyIndex > 0) router.back();
+      if (hasHistory) router.back();
       else router.replace({ query }, undefined, { shallow: true });
     } else {
       handleBackClick();
