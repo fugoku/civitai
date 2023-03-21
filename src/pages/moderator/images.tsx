@@ -65,7 +65,6 @@ export default function Images() {
   const { ref, inView } = useInView();
   const queryUtils = trpc.useContext();
   const [selected, selectedHandlers] = useListState([] as number[]);
-  const stackRef = useRef<HTMLDivElement>(null);
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage, isRefetching, refetch } =
     trpc.image.getGalleryImagesInfinite.useInfiniteQuery(
@@ -248,7 +247,7 @@ export default function Images() {
 
   return (
     <Container size="xl">
-      <Stack ref={stackRef}>
+      <Stack>
         <Paper
           withBorder
           shadow="lg"
