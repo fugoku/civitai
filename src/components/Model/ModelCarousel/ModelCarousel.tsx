@@ -15,12 +15,12 @@ import {
 import { IconInfoCircle } from '@tabler/icons';
 import { useRouter } from 'next/router';
 
-import { useGalleryFilters } from '~/components/Gallery/GalleryFilters';
 import { ImageGuard } from '~/components/ImageGuard/ImageGuard';
 import { MediaHash } from '~/components/ImageHash/ImageHash';
 import { ImageMetaPopover } from '~/components/ImageMeta/ImageMeta';
 import { ImagePreview } from '~/components/ImagePreview/ImagePreview';
 import { Reactions } from '~/components/Reaction/Reactions';
+import { useFiltersContext, useImageFilters } from '~/providers/FiltersProvider';
 import { RoutedContextLink } from '~/providers/RoutedContextProvider';
 import { trpc } from '~/utils/trpc';
 
@@ -99,7 +99,8 @@ export function ModelCarousel({
 }: Props) {
   const router = useRouter();
   const { classes, cx } = useStyles();
-  const { filters, clearFilters } = useGalleryFilters();
+  const setFilters = useFiltersContext((state) => state.setFilters);
+  const filters = useImageFilters();
 
   const { data, isLoading } = trpc.image.getInfinite.useInfiniteQuery({
     modelVersionId: modelVersionId,
@@ -156,7 +157,7 @@ export function ModelCarousel({
               variant="outline"
               onClick={() =>
                 hasTagFilters
-                  ? clearFilters()
+                  ? setFilters({ image: {} }) // TODO.briant - work on filters, since this won't clear
                   : router.push(`/posts/create?modelId=${modelId}&modelVersionId=${modelVersionId}`)
               }
             >
