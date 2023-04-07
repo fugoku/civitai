@@ -33,6 +33,7 @@ import { InView } from 'react-intersection-observer';
 import { CivitiaLinkManageButton } from '~/components/CivitaiLink/CivitiaLinkManageButton';
 import { CivitaiTooltip } from '~/components/CivitaiWrapped/CivitaiTooltip';
 import { EdgeImage } from '~/components/EdgeImage/EdgeImage';
+import { Freeze } from '~/components/Freeze/Freeze';
 import { HideModelButton } from '~/components/HideModelButton/HideModelButton';
 import { HideUserButton } from '~/components/HideUserButton/HideUserButton';
 import { IconBadge } from '~/components/IconBadge/IconBadge';
@@ -343,168 +344,174 @@ export function AmbientModelCard2({ data, width, height }: Props) {
                 if (!(e.ctrlKey || e.metaKey) && e.button !== 1) setLoading(true);
               }}
             >
-              {image && inView && (
-                <>
-                  <LoadingOverlay visible={loading} zIndex={9} loaderProps={{ variant: 'dots' }} />
-                  <ImageGuard
-                    images={[image]}
-                    connect={{ entityId: id, entityType: 'model' }}
-                    render={(image) => (
-                      <Box sx={{ position: 'relative' }}>
-                        {contextMenuItems.length > 0 && (
-                          <Menu position="left-start" withArrow offset={-5}>
-                            <Menu.Target>
-                              <ActionIcon
-                                variant="transparent"
-                                p={0}
-                                onClick={(e: React.MouseEvent) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                }}
-                                sx={{
-                                  width: 30,
-                                  position: 'absolute',
-                                  top: 10,
-                                  right: 4,
-                                  zIndex: 8,
-                                }}
-                              >
-                                <IconDotsVertical
-                                  size={24}
-                                  color="#fff"
-                                  style={{ filter: `drop-shadow(0 0 2px #000)` }}
-                                />
-                              </ActionIcon>
-                            </Menu.Target>
-                            <Menu.Dropdown>
-                              {contextMenuItems.map((el, index) => (
-                                <React.Fragment key={index}>{el}</React.Fragment>
-                              ))}
-                            </Menu.Dropdown>
-                          </Menu>
-                        )}
-                        <Group spacing={4} className={classes.cardBadges}>
-                          <ImageGuard.ToggleConnect
-                            sx={(theme) => ({
-                              backgroundColor: theme.fn.rgba(theme.colors.red[9], 0.4),
-                              color: 'white',
-                              backdropFilter: 'blur(7px)',
-                              boxShadow: '1px 2px 3px -1px rgba(37,38,43,0.2)',
-                            })}
-                            position="static"
-                          />
-                          {modelBadges}
-                        </Group>
-                        <ImageGuard.Unsafe>
-                          <AspectRatio ratio={(image?.width ?? 1) / (image?.height ?? 1)}>
-                            <MediaHash {...image} />
-                          </AspectRatio>
-                        </ImageGuard.Unsafe>
-                        <ImageGuard.Safe>
-                          <EdgeImage
-                            src={image.url}
-                            name={image.name ?? image.id.toString()}
-                            alt={image.name ?? undefined}
-                            width={450}
-                            placeholder="empty"
-                            style={{ width: '100%', zIndex: 2, position: 'relative' }}
-                          />
-                        </ImageGuard.Safe>
-                      </Box>
-                    )}
-                  />
-                  <Stack className={classes.info} spacing={8}>
-                    <Group
-                      mx="xs"
-                      position="apart"
-                      sx={{
-                        zIndex: 10,
-                      }}
-                    >
-                      <CivitiaLinkManageButton
-                        modelId={id}
-                        modelName={name}
-                        modelType={data.type}
-                        hashes={data.hashes}
-                        tooltipProps={{
-                          position: 'right',
-                          transition: 'slide-right',
-                          variant: 'smallRounded',
+              <Freeze freeze={!inView}>
+                {image && (
+                  <>
+                    <LoadingOverlay
+                      visible={loading}
+                      zIndex={9}
+                      loaderProps={{ variant: 'dots' }}
+                    />
+                    <ImageGuard
+                      images={[image]}
+                      connect={{ entityId: id, entityType: 'model' }}
+                      render={(image) => (
+                        <Box sx={{ position: 'relative' }}>
+                          {contextMenuItems.length > 0 && (
+                            <Menu position="left-start" withArrow offset={-5}>
+                              <Menu.Target>
+                                <ActionIcon
+                                  variant="transparent"
+                                  p={0}
+                                  onClick={(e: React.MouseEvent) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                  }}
+                                  sx={{
+                                    width: 30,
+                                    position: 'absolute',
+                                    top: 10,
+                                    right: 4,
+                                    zIndex: 8,
+                                  }}
+                                >
+                                  <IconDotsVertical
+                                    size={24}
+                                    color="#fff"
+                                    style={{ filter: `drop-shadow(0 0 2px #000)` }}
+                                  />
+                                </ActionIcon>
+                              </Menu.Target>
+                              <Menu.Dropdown>
+                                {contextMenuItems.map((el, index) => (
+                                  <React.Fragment key={index}>{el}</React.Fragment>
+                                ))}
+                              </Menu.Dropdown>
+                            </Menu>
+                          )}
+                          <Group spacing={4} className={classes.cardBadges}>
+                            <ImageGuard.ToggleConnect
+                              sx={(theme) => ({
+                                backgroundColor: theme.fn.rgba(theme.colors.red[9], 0.4),
+                                color: 'white',
+                                backdropFilter: 'blur(7px)',
+                                boxShadow: '1px 2px 3px -1px rgba(37,38,43,0.2)',
+                              })}
+                              position="static"
+                            />
+                            {modelBadges}
+                          </Group>
+                          <ImageGuard.Unsafe>
+                            <AspectRatio ratio={(image?.width ?? 1) / (image?.height ?? 1)}>
+                              <MediaHash {...image} />
+                            </AspectRatio>
+                          </ImageGuard.Unsafe>
+                          <ImageGuard.Safe>
+                            <EdgeImage
+                              src={image.url}
+                              name={image.name ?? image.id.toString()}
+                              alt={image.name ?? undefined}
+                              width={450}
+                              placeholder="empty"
+                              style={{ width: '100%', zIndex: 2, position: 'relative' }}
+                            />
+                          </ImageGuard.Safe>
+                        </Box>
+                      )}
+                    />
+                    <Stack className={classes.info} spacing={8}>
+                      <Group
+                        mx="xs"
+                        position="apart"
+                        sx={{
+                          zIndex: 10,
                         }}
                       >
-                        {({ color, onClick, ref, icon }) => (
-                          <ActionIcon
-                            component="button"
-                            ref={ref}
-                            radius="lg"
-                            variant="filled"
-                            size="lg"
-                            color={color}
-                            sx={() => ({
-                              opacity: 0.8,
-                              boxShadow:
-                                '0 1px 3px rgb(0 0 0 / 50%), rgb(0 0 0 / 50%) 0px 8px 15px -5px',
-                              transition: 'opacity .25s ease',
-                              position: 'relative',
-
-                              '&:hover': {
-                                opacity: 1,
-                              },
-                            })}
-                            onClick={onClick}
-                          >
-                            {icon}
-                          </ActionIcon>
-                        )}
-                      </CivitiaLinkManageButton>
-                      {data.user.image && (
-                        <CivitaiTooltip
-                          position="left"
-                          transition="slide-left"
-                          variant="smallRounded"
-                          label={
-                            <Text size="xs" weight={500}>
-                              {data.user.username}
-                            </Text>
-                          }
+                        <CivitiaLinkManageButton
+                          modelId={id}
+                          modelName={name}
+                          modelType={data.type}
+                          hashes={data.hashes}
+                          tooltipProps={{
+                            position: 'right',
+                            transition: 'slide-right',
+                            variant: 'smallRounded',
+                          }}
                         >
-                          <Box
-                            sx={{
-                              borderRadius: '50%',
-                            }}
-                            onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              push(`/user/${data.user.username}`);
-                            }}
-                            ml="auto"
-                          >
-                            <UserAvatar
-                              size="md"
-                              user={data.user}
-                              avatarProps={{ className: classes.userAvatar }}
-                            />
-                          </Box>
-                        </CivitaiTooltip>
-                      )}
-                    </Group>
+                          {({ color, onClick, ref, icon }) => (
+                            <ActionIcon
+                              component="button"
+                              ref={ref}
+                              radius="lg"
+                              variant="filled"
+                              size="lg"
+                              color={color}
+                              sx={() => ({
+                                opacity: 0.8,
+                                boxShadow:
+                                  '0 1px 3px rgb(0 0 0 / 50%), rgb(0 0 0 / 50%) 0px 8px 15px -5px',
+                                transition: 'opacity .25s ease',
+                                position: 'relative',
 
-                    <Stack className={classes.content} spacing={6} p="xs">
-                      <Group position="left" spacing={4}>
-                        {modelText}
+                                '&:hover': {
+                                  opacity: 1,
+                                },
+                              })}
+                              onClick={onClick}
+                            >
+                              {icon}
+                            </ActionIcon>
+                          )}
+                        </CivitiaLinkManageButton>
+                        {data.user.image && (
+                          <CivitaiTooltip
+                            position="left"
+                            transition="slide-left"
+                            variant="smallRounded"
+                            label={
+                              <Text size="xs" weight={500}>
+                                {data.user.username}
+                              </Text>
+                            }
+                          >
+                            <Box
+                              sx={{
+                                borderRadius: '50%',
+                              }}
+                              onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                push(`/user/${data.user.username}`);
+                              }}
+                              ml="auto"
+                            >
+                              <UserAvatar
+                                size="md"
+                                user={data.user}
+                                avatarProps={{ className: classes.userAvatar }}
+                              />
+                            </Box>
+                          </CivitaiTooltip>
+                        )}
                       </Group>
-                      <Group position="apart" spacing={0}>
-                        {modelRating}
-                        <Group spacing={4} align="center" ml="auto">
-                          {modelLikes}
-                          {modelComments}
-                          {modelDownloads}
+
+                      <Stack className={classes.content} spacing={6} p="xs">
+                        <Group position="left" spacing={4}>
+                          {modelText}
                         </Group>
-                      </Group>
+                        <Group position="apart" spacing={0}>
+                          {modelRating}
+                          <Group spacing={4} align="center" ml="auto">
+                            {modelLikes}
+                            {modelComments}
+                            {modelDownloads}
+                          </Group>
+                        </Group>
+                      </Stack>
                     </Stack>
-                  </Stack>
-                </>
-              )}
+                  </>
+                )}
+              </Freeze>
             </MasonryCard>
           </Link>
         )}
