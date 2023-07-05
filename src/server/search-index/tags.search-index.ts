@@ -59,7 +59,6 @@ const onIndexUpdate = async ({ db, lastUpdatedAt, indexName }: SearchIndexRunCon
   let offset = 0;
   const tagTasks: EnqueuedTask[] = [];
 
-  // TODO: confirm if the queue can grow big enough that querying without a limit can be a concern.
   const queuedItems = await db.searchIndexUpdateQueue.findMany({
     select: {
       id: true,
