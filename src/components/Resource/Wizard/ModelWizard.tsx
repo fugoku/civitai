@@ -13,6 +13,7 @@ import { isEqual } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
+import { ModelUploadType } from '@prisma/client';
 import { PostEditWrapper } from '~/components/Post/Edit/PostEditLayout';
 import { Files, UploadStepActions } from '~/components/Resource/Files';
 import { FilesProvider } from '~/components/Resource/FilesProvider';
@@ -42,7 +43,12 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export function ModelWizard() {
+const maxWizardSteps = {
+  create: 4,
+  train: 4,
+};
+
+export function ModelWizard({ type }: { type?: 'create' | 'train' }) {
   const { classes } = useStyles();
   const router = useRouter();
   const { getStatus: getUploadStatus } = useS3UploadStore();
@@ -53,6 +59,17 @@ export function ModelWizard() {
 
   const { data: model } = trpc.model.getById.useQuery({ id: Number(id) }, { enabled: !!id });
 
+  let uploadType = type;
+  if (!uploadType) {
+    if (!!model) {
+      uploadType = model.uploadType === ModelUploadType.Trained ? 'train' : 'create';
+    } else {
+      uploadType = 'create';
+    }
+  }
+
+  const maxSteps = maxWizardSteps[uploadType];
+
   const editing = !!model;
   const hasVersions = model && model.modelVersions.length > 0;
   const hasFiles = model && model.modelVersions.some((version) => version.files.length > 0);
@@ -62,7 +79,7 @@ export function ModelWizard() {
   );
 
   const goNext = () => {
-    if (state.step < 4)
+    if (state.step < maxSteps)
       router.replace(`/models/${id}/wizard?step=${state.step + 1}`, undefined, {
         shallow: true,
       });
