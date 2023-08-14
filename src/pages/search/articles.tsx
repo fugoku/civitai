@@ -58,7 +58,7 @@ const RenderFilters = () => {
   return (
     <>
       <SortBy
-        title="Sort models by"
+        title="Sort articles by"
         items={[
           { label: 'Most Bookmarked', value: 'articles:stats.favoriteCount:desc' },
           { label: 'Most Viewed', value: 'articles:stats.viewCount:desc' },
