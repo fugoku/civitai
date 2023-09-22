@@ -185,7 +185,6 @@ export function BountyFiltersDropdown() {
           color="gray"
           variant={theme.colorScheme === 'dark' ? 'filled' : 'light'}
           onClick={clearFilters}
-          // sx={{ position: 'absolute', bottom: 0 }}
           fullWidth
         >
           Clear all filters
