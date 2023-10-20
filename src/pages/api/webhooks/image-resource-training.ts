@@ -7,6 +7,8 @@ import { WebhookEndpoint } from '~/server/utils/endpoint-helpers';
 
 export type EpochSchema = z.infer<typeof epoch_schema>;
 
+// TODO: delete this file once all the old jobs are complete
+
 const epoch_schema = z.object({
   epoch_number: z.number(),
   model_url: z.string(),
