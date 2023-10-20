@@ -7,6 +7,8 @@ import { WebhookEndpoint } from '~/server/utils/endpoint-helpers';
 
 export type EpochSchema = z.infer<typeof epoch_schema>;
 
+// TODO: delete this file once all the old jobs are complete
+
 const epoch_schema = z.object({
   epoch_number: z.number(),
   model_url: z.string(),
@@ -43,13 +45,12 @@ const context = z.object({
 const schema = z.object({
   type: z.string(),
   jobId: z.string(),
-  dateTime: z.string(),
-  claimDuration: z.string().optional(),
-  jobDuration: z.string().optional(),
+  date: z.string(),
+  duration: z.string().optional(),
+  totalDuration: z.string().optional(),
   workerId: z.string().optional(),
-  retryAttempt: z.number().optional(),
+  attempt: z.number().optional(),
   context: context.nullable(),
-  jobHasCompleted: z.boolean(),
 });
 
 export default WebhookEndpoint(async (req, res) => {
@@ -64,21 +65,20 @@ export default WebhookEndpoint(async (req, res) => {
 
   const data = bodyResults.data;
 
-  // Initialized, Claimed, Rejected, LateRejected, ClaimExpired, Updated, Failed, Succeeded, Expired, Deleted
   const status = {
-    Succeeded: TrainingStatus.InReview,
-    Updated: TrainingStatus.Processing,
-    Failed: TrainingStatus.Failed,
-    Rejected: TrainingStatus.Failed,
-    LateRejected: TrainingStatus.Failed,
+    Success: TrainingStatus.InReview,
+    Update: TrainingStatus.Processing,
+    Fail: TrainingStatus.Failed,
+    Reject: TrainingStatus.Failed,
+    LateReject: TrainingStatus.Failed,
   }[data.type];
 
   switch (data.type) {
-    case 'Succeeded':
-    case 'Failed':
-    case 'Rejected':
-    case 'LateRejected':
-    case 'Updated':
+    case 'Success':
+    case 'Fail':
+    case 'Reject':
+    case 'LateReject':
+    case 'Update':
       if (!data.context) {
         return res.status(400).json({ ok: false, error: 'context is undefined' });
       }
@@ -90,18 +90,12 @@ export default WebhookEndpoint(async (req, res) => {
       }
 
       break;
-    case 'Initialized':
-    case 'Expired':
-    case 'Claimed':
-    case 'ClaimExpired':
-    case 'Deleted':
+    case 'Expire':
+    case 'Claim':
+      // TODO: handle these now that we have the job id
       break;
     default:
       return res.status(400).json({ ok: false, error: 'type not supported' });
-  }
-
-  if (['Deleted', 'Expired', 'Failed'].includes(data.type)) {
-    // refund API using transaction ID
   }
 
   return res.status(200).json({ ok: true });
