@@ -10,11 +10,6 @@ import React, { useState } from 'react';
 import { trpc } from '~/utils/trpc';
 import { IconPlus } from '@tabler/icons-react';
 import { ClubManagementLayout } from '~/pages/clubs/manage/[id]/index';
-import { ClubTierUpsertForm } from '~/components/Club/ClubTierUpsertForm';
-import { ClubTierManageItem } from '~/components/Club/ClubTierManageItem';
-import { useClubFeedStyles } from '~/components/Club/ClubFeed';
-import { GetInfiniteClubMembershipsSchema } from '~/server/schema/clubMembership.schema';
-import { ClubMembershipSort } from '~/server/common/enums';
 import { ClubMembershipInfinite } from '~/components/Club/Infinite/ClubsMembershipInfinite';
 
 const querySchema = z.object({ id: z.coerce.number() });
