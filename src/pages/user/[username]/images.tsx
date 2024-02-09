@@ -1,6 +1,6 @@
 import { useCurrentUser } from '~/hooks/useCurrentUser';
 import { useFeatureFlags } from '~/providers/FeatureFlagsProvider';
-import { MetricTimeframe, ReviewReactions } from '@prisma/client';
+import { MediaType, MetricTimeframe, ReviewReactions } from '@prisma/client';
 import { ImageSort } from '~/server/common/enums';
 import { useImageQueryParams } from '~/components/Image/image.utils';
 import { postgresSlugify } from '~/utils/string-helpers';
@@ -93,7 +93,7 @@ export function UserImagesPage() {
       sort = ImageSort.Newest,
       username = '',
       reactions,
-      types = [],
+      types = [MediaType.image],
       withMeta = false,
       followed = undefined,
       ...query
