@@ -13,6 +13,7 @@ import {
   ThemeIcon,
   Group,
   createStyles,
+  Flex,
 } from '@mantine/core';
 import { trpc } from '~/utils/trpc';
 import { createServerSideProps } from '~/server/utils/server-side-helpers';
@@ -33,145 +34,96 @@ import { useRouter } from 'next/router';
 import { getFeatureFlags } from '~/server/services/feature-flags.service';
 import { ContainerGrid } from '~/components/ContainerGrid/ContainerGrid';
 import { containerQuery } from '~/utils/mantine-css-helpers';
+import { Meta } from '~/components/Meta/Meta';
+import { NextLink } from '@mantine/next';
 
-export default function Pricing() {
+export default function CivitaiVault() {
   const router = useRouter();
   const { classes, cx } = useStyles();
-  const { returnUrl = '/', reason } = router.query as {
-    returnUrl: string;
-    reason: JoinRedirectReason;
+  const currentUser = useCurrentUser();
+  const isMember = currentUser?.isMember;
+  const buttonData = {
+    text: isMember ? 'Go to my Vault' : 'Become a member',
+    href: isMember ? '/user/vault' : '/pricing',
   };
-  const redirectReason = joinRedirectReasons[reason];
-
-  const { data: products, isLoading: productsLoading } = trpc.stripe.getPlans.useQuery();
-  const { data: subscription, isLoading: subscriptionLoading } =
-    trpc.stripe.getUserSubscription.useQuery();
-
-  const isLoading = productsLoading || subscriptionLoading;
-  const showSubscribeButton = !subscription || !!subscription.canceledAt;
 
   return (
     <>
-      <Container size="sm" mb="lg">
+      <Meta
+        title="Civitai Vault | Store your favorite models forever"
+        description="Civitai Vault is a place to store your favorite models forever. Even if a model is removed from the site, you can still access it here."
+      />
+      <Container size="lg" mb="lg">
         <Stack>
-          {!!redirectReason && (
-            <Alert color="yellow">
-              <Group spacing="xs" noWrap align="flex-start">
-                <ThemeIcon color="yellow">
-                  <IconExclamationMark />
-                </ThemeIcon>
-                <Text size="md">{redirectReason}</Text>
-              </Group>
-            </Alert>
-          )}
-          <Title align="center" className={classes.title}>
-            Support Us ❤️
-          </Title>
-          <Text align="center" className={classes.introText} sx={{ lineHeight: 1.25 }}>
-            {`As the leading model sharing service, we're adding new features every week. Help us keep the community thriving by becoming a member or making a donation. Support Civitai and get exclusive perks.`}
-          </Text>
-        </Stack>
-      </Container>
-      <Container>
-        <Tabs variant="outline" defaultValue="subscribe">
-          <Tabs.List position="center">
-            <Tabs.Tab value="subscribe" icon={<IconCalendarDue size={20} />}>
-              Membership
-            </Tabs.Tab>
-            <Tabs.Tab value="donate" icon={<IconHeartHandshake size={20} />}>
-              Donate
-            </Tabs.Tab>
-          </Tabs.List>
-
-          <Tabs.Panel value="subscribe" pt="md">
-            <Stack>
-              {isLoading ? (
-                <Center p="xl">
-                  <Loader />
-                </Center>
-              ) : !products ? (
-                <Center>
-                  <Alert p="xl" title="There are no products to display">
-                    Check back in a little while to see what we have to offer
-                  </Alert>
-                </Center>
-              ) : (
-                <ContainerGrid justify="center">
-                  {products.map((product) => (
-                    <ContainerGrid.Col key={product.id} md={4} sm={6} xs={12}>
-                      <PlanCard product={product} subscription={subscription} />
-                    </ContainerGrid.Col>
-                  ))}
-                </ContainerGrid>
-              )}
-              {!showSubscribeButton && (
-                <Center>
-                  <ManageSubscriptionButton>
-                    <Button>Manage your Membership</Button>
-                  </ManageSubscriptionButton>
-                </Center>
-              )}
+          <Group>
+            <Stack spacing={4}>
+              <Title align="center" className={classes.title}>
+                Civitai Vault
+              </Title>
+              <Text align="center" className={classes.introText} sx={{ lineHeight: 1.25 }}>
+                ❤️ Civitai Vault is only available to members
+              </Text>
             </Stack>
-          </Tabs.Panel>
-
-          <Tabs.Panel value="donate" pt="md">
-            <ContainerGrid justify="center">
-              <ContainerGrid.Col md={4} sm={6} xs={12}>
-                <Card withBorder style={{ height: '100%' }}>
-                  <Stack justify="space-between" style={{ height: '100%' }}>
-                    <Stack spacing={0} mb="md">
-                      <Center>
-                        <EdgeMedia
-                          src="ab3e161b-7c66-4412-9573-ca16dde9f900"
-                          className={classes.image}
-                          width={128}
-                        />
-                      </Center>
-                      <Title className={classes.cardTitle} order={2} align="center">
-                        One-time Donation
-                      </Title>
-                    </Stack>
-                    <PlanBenefitList
-                      benefits={[
-                        { content: 'Unique Donator badge' },
-                        { content: 'Unique nameplate color' },
-                        { content: 'Unique Discord role for 30 days' },
-                      ]}
-                    />
-                    <DonateButton>
-                      <Button>Donate</Button>
-                    </DonateButton>
-                  </Stack>
-                </Card>
-              </ContainerGrid.Col>
-            </ContainerGrid>
-          </Tabs.Panel>
-        </Tabs>
+            <Button
+              variant="filled"
+              color="blue"
+              size="lg"
+              radius="xl"
+              fullWidth
+              component={NextLink}
+              href={buttonData.href}
+              rel="nofollow noreferrer"
+            >
+              {buttonData.text}
+            </Button>{' '}
+          </Group>
+        </Stack>
       </Container>
     </>
   );
 }
 
 const useStyles = createStyles((theme) => ({
-  title: {
-    [containerQuery.smallerThan('sm')]: {
-      fontSize: 24,
+  cta: {
+    height: 52,
+  }
+  heroTitle: {
+    fontSize: 32,
+    fontWeight: 700,
+    color: theme.colorScheme === 'dark' ? '#fff' : theme.colors.gray[9],
+    [containerQuery.largerThan('md')]: {
+      fontSize: 40,
     },
   },
-  introText: {
-    [containerQuery.smallerThan('sm')]: {
-      fontSize: 14,
-    },
+  heroText: {
+    fontSize: 14,
+    fontWeight: 500,
   },
-  image: {
-    [containerQuery.smallerThan('sm')]: {
-      width: 96,
-      marginBottom: theme.spacing.xs,
-    },
+  heading: {
+    fontSize: 24,
+    fontWeight: 700,
+    color: theme.colorScheme === 'dark' ? '#fff' : theme.colors.gray[9],
   },
-  cardTitle: {
-    [containerQuery.smallerThan('sm')]: {
-      fontSize: 20,
-    },
+  copy: {
+    fontSize: 16,
+    fontWeight: 500,
+  },
+  videoBorder: {
+    borderRadius: 12,
+    width: '100%',
+    border: '1px solid #2D2E32',
+    borderBottom: 'none',
+  },
+  gradientContainer: {
+    position: 'relative',
+    marginBottom: 24,
+  },
+  gradientBox: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'linear-gradient(180deg, rgba(26, 27, 30, 0.00) 50%, #1A1B1E 100%)',
   },
 }));
