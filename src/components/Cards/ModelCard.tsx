@@ -64,6 +64,10 @@ import { ToggleSearchableMenuItem } from '../MenuItems/ToggleSearchableMenuItem'
 import { ImageGuard2 } from '~/components/ImageGuard/ImageGuard2';
 import { ThumbsUpIcon } from '~/components/ThumbsIcon/ThumbsIcon';
 import { browsingLevelLabels } from '~/shared/constants/browsingLevel.constants';
+import { IconNose } from '~/components/SVG/IconNose';
+import { UserAvatarSimple } from '~/components/UserAvatar/UserAvatarSimple';
+import { NextLink } from '@mantine/next';
+import { AddArtFrameMenuItem } from '~/components/Decorations/AddArtFrameMenuItem';
 
 const IMAGE_CARD_WIDTH = 450;
 
@@ -141,6 +145,7 @@ export function ModelCard({ data, forceInView }: Props) {
   if (features.profileOverhaul && currentUser?.id === data.user.id) {
     contextMenuItems = contextMenuItems.concat([
       <AddToShowcaseMenuItem key="add-to-showcase" entityType="Model" entityId={data.id} />,
+      <AddArtFrameMenuItem key="add-art-frame" entity={data} entityType="model" />,
     ]);
   }
 
