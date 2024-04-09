@@ -1,0 +1,173 @@
+import {
+  Center,
+  Container,
+  Group,
+  Loader,
+  LoadingOverlay,
+  Pagination,
+  Table,
+  Text,
+  ThemeIcon,
+  Stack,
+  Title,
+  Button,
+  ActionIcon,
+  Box,
+  TextInput,
+  Badge,
+} from '@mantine/core';
+import { useDebouncedValue } from '@mantine/hooks';
+import { NextLink } from '@mantine/next';
+import { BuzzWithdrawalRequestStatus, CosmeticType, Currency } from '@prisma/client';
+import { IconCloudOff, IconEdit, IconPlus } from '@tabler/icons-react';
+import { useState } from 'react';
+import { useQueryCosmeticShopItemsPaged } from '~/components/CosmeticShop/cosmetic-shop.util';
+import { CosmeticsFiltersDropdown } from '~/components/Cosmetics/CosmeticsFiltersDropdown';
+import { useQueryCosmeticsPaged } from '~/components/Cosmetics/cosmetics.util';
+import { CurrencyBadge } from '~/components/Currency/CurrencyBadge';
+import { EdgeMedia } from '~/components/EdgeMedia/EdgeMedia';
+import { Meta } from '~/components/Meta/Meta';
+import { UserAvatar } from '~/components/UserAvatar/UserAvatar';
+import { useCurrentUser } from '~/hooks/useCurrentUser';
+import { CosmeticSample } from '~/pages/moderator/cosmetic-store/cosmetics';
+import { PurchasableRewardModeratorViewMode } from '~/server/common/enums';
+import { GetPaginatedCosmeticShopItemInput } from '~/server/schema/cosmetic-shop.schema';
+import { GetPaginatedCosmeticsInput } from '~/server/schema/cosmetic.schema';
+import { GetPaginatedPurchasableRewardsModeratorSchema } from '~/server/schema/purchasable-reward.schema';
+import { NamePlateCosmetic } from '~/server/selectors/cosmetic.selector';
+import { CosmeticGetById } from '~/types/router';
+import { formatDate } from '~/utils/date-helpers';
+
+import { trpc } from '~/utils/trpc';
+
+export default function CosmeticStoreProducts() {
+  const [filters, setFilters] = useState<Omit<GetPaginatedCosmeticShopItemInput, 'limit'>>({
+    page: 1,
+  });
+  const [debouncedFilters, cancel] = useDebouncedValue(filters, 500);
+  const {
+    cosmeticShopItems,
+    pagination,
+    isLoading: isLoadingCosmetics,
+    isRefetching,
+  } = useQueryCosmeticShopItemsPaged(debouncedFilters);
+
+  const isLoading = isLoadingCosmetics;
+
+  return (
+    <>
+      <Meta title="Shop Products" deIndex />
+      <Container size="lg">
+        <Stack spacing={0} mb="xl">
+          <Title order={1}>Shop Products</Title>
+          <Text size="sm" color="dimmed">
+            You can add and manage shop products here. A cosmetic must be created before hand for it
+            to be created into a shop product.
+          </Text>
+        </Stack>
+        <Group position="apart" mb="md">
+          <Group align="flex-end">
+            <Button
+              component={NextLink}
+              href="/moderator/cosmetic-store/products/create"
+              radius="xl"
+            >
+              <IconPlus />
+              Add Product
+            </Button>
+            <TextInput
+              label="Filter by name"
+              value={filters.name ?? ''}
+              onChange={(e) => setFilters({ ...filters, name: e.target.value || undefined })}
+              size="sm"
+              miw={300}
+              radius="xl"
+              mb={0}
+            />
+          </Group>
+          <Group>
+            <CosmeticsFiltersDropdown
+              setFilters={(f) => setFilters({ ...filters, ...f })}
+              filters={filters}
+            />
+          </Group>
+        </Group>
+        {isLoading ? (
+          <Center p="xl">
+            <Loader />
+          </Center>
+        ) : !!cosmeticShopItems.length ? (
+          <div style={{ position: 'relative' }}>
+            <LoadingOverlay visible={isRefetching ?? false} zIndex={9} />
+
+            <Table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Type</th>
+                  <th>Sample</th>
+                  <th>Price</th>
+                  <th>Available From</th>
+                  <th>Available To</th>
+                  <th>Total Quantity</th>
+                  <th>&nbsp;</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cosmeticShopItems.map((shopItem) => {
+                  return (
+                    <tr key={shopItem.id}>
+                      <td>
+                        <Stack spacing={0} maw={350}>
+                          <Text>{shopItem.title}</Text>
+                          <Text color="dimmed" size="sm">
+                            {shopItem.description}
+                          </Text>
+                        </Stack>
+                      </td>
+                      <td>{shopItem.cosmetic.type}</td>
+                      <td>
+                        <CosmeticSample cosmetic={shopItem.cosmetic} />
+                      </td>
+                      <td>
+                        <CurrencyBadge unitAmount={shopItem.unitAmount} currency={Currency.BUZZ} />
+                      </td>
+                      <td>{shopItem.availableFrom ? formatDate(shopItem.availableFrom) : '-'}</td>
+                      <td>{shopItem.availableTo ? formatDate(shopItem.availableTo) : '-'}</td>
+                      <td>{!!shopItem.availableQuantity ? shopItem.availableQuantity : '-'}</td>
+                      <td>
+                        <ActionIcon
+                          component={NextLink}
+                          href={`/moderator/cosmetic-shop/products/update/${shopItem.id}`}
+                        >
+                          <IconEdit />
+                        </ActionIcon>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              {pagination && pagination.totalPages > 1 && (
+                <Group position="apart">
+                  <Text>Total {pagination.totalItems.toLocaleString()} items</Text>
+                  <Pagination
+                    page={filters.page}
+                    onChange={(page) => setFilters((curr) => ({ ...curr, page }))}
+                    total={pagination.totalPages}
+                  />
+                </Group>
+              )}
+            </Table>
+          </div>
+        ) : (
+          <Stack align="center">
+            <ThemeIcon size={62} radius={100}>
+              <IconCloudOff />
+            </ThemeIcon>
+            <Text align="center">Looks like no shop items have been created yet. Start now!.</Text>
+          </Stack>
+        )}
+      </Container>
+    </>
+  );
+}

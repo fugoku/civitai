@@ -35,7 +35,7 @@ import { CosmeticGetById } from '~/types/router';
 
 import { trpc } from '~/utils/trpc';
 
-const CosmeticSample = ({
+export const CosmeticSample = ({
   cosmetic,
 }: {
   cosmetic: Pick<CosmeticGetById, 'id' | 'data' | 'type' | 'name' | 'source'>;
@@ -112,7 +112,8 @@ export default function CosmeticStoreProducts() {
             page.
           </Text>
           <Text size="sm" color="dimmed">
-            The ability to create cosmetics from this page will be Coming soon
+            The ability to create cosmetics from this &amo; grant it to users will be coming soon
+            (TM).
           </Text>
         </Stack>
         <Group position="apart" mb="md">
