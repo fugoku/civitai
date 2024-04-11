@@ -27,8 +27,8 @@ export default function ProductsCreate() {
 
   const handleSuccess = () => {
     showSuccessNotification({
-      title: 'Club post created',
-      message: 'Your post was created and is now part of your club',
+      title: 'A new cosmetic shop product was created',
+      message: 'You can now add this product to a section in the store.',
     });
 
     router.push('/moderator/cosmetic-store/products');

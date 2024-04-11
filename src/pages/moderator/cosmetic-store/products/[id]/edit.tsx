@@ -48,7 +48,6 @@ export default function ProductEdit({
   id,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
-  console.log(id);
   const { cosmeticShopItem, isLoading } = useQueryCosmeticShopItem({ id });
 
   const handleCancel = () => {
@@ -57,8 +56,8 @@ export default function ProductEdit({
 
   const handleSuccess = () => {
     showSuccessNotification({
-      title: 'Club post created',
-      message: 'Your post was created and is now part of your club',
+      title: 'Cosmetic shop product updated',
+      message: 'Product has been updated successfully.',
     });
 
     router.push('/moderator/cosmetic-store/products');
