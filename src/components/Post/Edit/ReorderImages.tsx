@@ -15,7 +15,6 @@ import { IconArrowsMaximize, IconArrowsSort, IconCheck } from '@tabler/icons-rea
 import { isEqual } from 'lodash-es';
 import { CSSProperties } from 'react';
 import { EdgeMedia } from '~/components/EdgeMedia/EdgeMedia';
-import { PostEditImage } from '~/server/controllers/post.controller';
 import { trpc } from '~/utils/trpc';
 import { isDefined } from '~/utils/type-guards';
 import { useEditPostContext } from './EditPostProvider';
