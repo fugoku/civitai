@@ -5,6 +5,7 @@ import { getEncryptedCookie, setEncryptedCookie } from '~/server/utils/cookie-en
 import { WebhookEndpoint } from '~/server/utils/endpoint-helpers';
 import { getServerAuthSession } from '~/server/utils/get-server-auth-session';
 import { generationServiceCookie } from '~/shared/constants/generation.constants';
+import { env } from '~/env/server.mjs';
 
 export default WebhookEndpoint(async function (req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerAuthSession({ req, res });
@@ -12,6 +13,7 @@ export default WebhookEndpoint(async function (req: NextApiRequest, res: NextApi
   if (!user) return;
 
   let token = getEncryptedCookie({ req, res }, generationServiceCookie.name);
+  if (env.ORCHESTRATOR_MODE === 'dev') token = env.ORCHESTRATOR_ACCESS_TOKEN;
   if (!token) {
     token = await getTemporaryUserApiKey({
       name: generationServiceCookie.name,
