@@ -117,13 +117,13 @@ const useStyles = createStyles((theme) => ({
     display: 'grid',
     gridTemplateRows: 'masonry',
     gap: theme.spacing.xs,
-    gridTemplateColumns: '1fr 1fr',
+    gridTemplateColumns: '1fr',
 
     [`@container (min-width: 530px)`]: {
-      gridTemplateColumns: 'repeat(3, 1fr)',
+      gridTemplateColumns: 'repeat(2, 1fr)',
     },
     [`@container (min-width: 900px)`]: {
-      gridTemplateColumns: 'repeat(4, 1fr)',
+      gridTemplateColumns: 'repeat(3, 1fr)',
     },
     [`@container (min-width: 1200px)`]: {
       gridTemplateColumns: 'repeat(auto-fill, minmax(256px, 1fr))',
