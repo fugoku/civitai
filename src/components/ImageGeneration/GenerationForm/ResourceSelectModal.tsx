@@ -45,7 +45,10 @@ import { HideModelButton } from '~/components/HideModelButton/HideModelButton';
 import { HideUserButton } from '~/components/HideUserButton/HideUserButton';
 import { ImageGuard2 } from '~/components/ImageGuard/ImageGuard2';
 import { MediaHash } from '~/components/ImageHash/ImageHash';
-import { IntersectionObserverProvider } from '~/components/IntersectionObserver/IntersectionObserverProvider';
+import {
+  IntersectionObserverProvider,
+  useInViewDynamic,
+} from '~/components/IntersectionObserver/IntersectionObserverProvider';
 import { InViewLoader } from '~/components/InView/InViewLoader';
 import { ReportMenuItem } from '~/components/MenuItems/ReportMenuItem';
 import { CustomSearchBox } from '~/components/Search/CustomSearchComponents';
@@ -70,8 +73,9 @@ import {
 import { aDayAgo } from '~/utils/date-helpers';
 import { getDisplayName } from '~/utils/string-helpers';
 import { ResourceSelectOptions } from './resource-select.types';
+import { ScrollArea } from '~/components/ScrollArea/ScrollArea';
 
-type ResourceSelectModalProps = {
+export type ResourceSelectModalProps = {
   title?: React.ReactNode;
   onSelect: (value: Generation.Resource) => void;
   onClose?: () => void;
@@ -249,14 +253,17 @@ function ResourceHitList() {
     );
 
   return (
-    <Stack>
-      {hiddenCount > 0 && (
-        <Text color="dimmed">{hiddenCount} models have been hidden due to your settings.</Text>
-      )}
-      <IntersectionObserverProvider>
-        <Box className={classes.grid}>
-          {models.map((model, index) => createRenderElement(ResourceSelectCard, index, model))}
-        </Box>
+    <ScrollArea id="resource-select-modal">
+      <div className="flex flex-col gap-3">
+        {hiddenCount > 0 && (
+          <Text color="dimmed">{hiddenCount} models have been hidden due to your settings.</Text>
+        )}
+
+        <div className={classes.grid}>
+          {models
+            .filter((model) => model.versions.length > 0)
+            .map((model, index) => createRenderElement(ResourceSelectCard, index, model))}
+        </div>
         {hits.length > 0 && !isLastPage && (
           <InViewLoader loadFn={showMore} loadCondition={status === 'idle'}>
             <Center sx={{ height: 36 }} mt="md">
@@ -264,8 +271,8 @@ function ResourceHitList() {
             </Center>
           </InViewLoader>
         )}
-      </IntersectionObserverProvider>
-    </Stack>
+      </div>
+    </ScrollArea>
   );
 }
 
@@ -283,7 +290,7 @@ function ResourceSelectCard({
   data: SearchIndexDataMap['models'][number];
 }) {
   const currentUser = useCurrentUser();
-  const { ref, inView } = useInView();
+  const [ref, inView] = useInViewDynamic({ id: data.id.toString() });
   const { onSelect, canGenerate, isTraining, resources } = useResourceSelectContext();
   const image = data.images[0];
   const { classes, cx } = useCardStyles({
